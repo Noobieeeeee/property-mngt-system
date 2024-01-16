@@ -142,13 +142,13 @@ const MyReports = () => {
           <Link className="btn-edit" to={`/my-reports/edit/${params.row.id}`}>
             Edit
           </Link>
-          &nbsp;
-          <button
-            className="btn-delete"
-            onClick={(ev) => onDeleteClick(params.row)}
-          >
-            Delete
-          </button>
+            {/* &nbsp;
+            <button
+              className="btn-delete"
+              onClick={(ev) => onDeleteClick(params.row)}
+            >
+              Delete
+            </button> */}
         </>
       ),
     },
@@ -161,19 +161,21 @@ const MyReports = () => {
         return (
           <Box
             width="110%"
-            p="2px"
+            p="5px 10px"  
             display="flex"
             justifyContent="center"
             backgroundColor={
               status === "Accepted"
-                ? colors.greenAccent[700]
+                ? colors.greenAccent[500]
                 : status === "Denied"
-                ? colors.redAccent[700]
-                : colors.blueAccent[700]
+                ? colors.redAccent[500]
+                : colors.redAccent[500]
             }
             borderRadius="4px"
           >
-            <Typography color={colors.grey[100]}>{status}</Typography>
+            <Typography variant="p" color={colors.grey[100]}>
+              {status}
+            </Typography>
           </Box>
         );
       },

@@ -21,6 +21,7 @@ import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined"; // Moved import here
 import admin_image from "../img/admin.png";
 import default_img from "../img/default.png";
+import Logo from '../img/logo.jpg';
 
 import { useTheme } from "@mui/material/styles";
 
@@ -195,9 +196,7 @@ const Sidebar = ({ user }) => {
                   width="125px"
                   height="125px"
                   src={
-                    user.name && user.name.toLowerCase().includes("xyrus")
-                      ? admin_image
-                      : default_img
+                    Logo
                   }
                   style={{
                     cursor: "pointer",
