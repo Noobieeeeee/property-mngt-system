@@ -99,9 +99,16 @@ const UserForm = () => {
         address: values.address,
       });
 
+      console.log(res);
+
+
       if (res.status === 201) {
         setNotification("User created successfully");
         goBackToProfiles();
+      } 
+      else {
+        var errorMsg = res.error.response.data.message
+        setNotification(errorMsg);
       }
     }
   };

@@ -21,12 +21,12 @@ class UserController extends Controller
     {
         try{
             $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255|unique:users,name',
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8',
                 'status' => 'required|string',
                 'address' => 'required|string',
-                'contact_number' => 'required|string',
+                'contact_number' => 'required|string|unique:users,contact_number',
             ]);
 
             $user = User::create([

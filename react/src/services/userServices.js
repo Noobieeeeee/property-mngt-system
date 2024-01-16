@@ -18,7 +18,7 @@ export const CreateUser = async (userData) => {
     const res = await api.post(`/user/create`, userData);
     return res;
   } catch (error) {
-    return { error: error.message };
+    return { error};
   }
 };
 
