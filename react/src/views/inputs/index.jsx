@@ -9,21 +9,35 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import FormHelperText from "@mui/material/FormHelperText";
 import { CreateProperty } from "../../services/propertiesServices";
-import { useStateContext } from "../../context/ContextProvider";
+import { useStateContext } from "../../context/ContextProvider";  
+import { LocalizationProvider, DatePicker  } from "@mui/x-date-pickers";
+//import AdapterDate from '@mui/lab/AdapterDateFns'
+// import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
+//import AdapterDateFns from '@date-io/date-fns';  // Import from @date-io/date-fns
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 const Form = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const [newProperty, setNewProperty] = useState({});
+  const [assumptionDate, setAssumptionDate] = useState("");
   const { setNotification } = useStateContext();
 
-  const handleFormSubmit = async (values, { resetForm }) => {
-    // console.log(newProperty);
+  var formattedAssumptionDate;
 
+
+  useEffect(()=>{
+    formattedAssumptionDate=`${assumptionDate.$y}-${(assumptionDate.$m+1) < 10 ? '0'+(assumptionDate.$m+1) : (assumptionDate.$m+1) }-${(assumptionDate.$D) < 10 ? '0'+(assumptionDate.$D) : (assumptionDate.$D)}`;
+    console.log(formattedAssumptionDate);
+  },[assumptionDate])
+
+  const handleFormSubmit = async (values, { resetForm }) => {
+    
     const res = await CreateProperty({
       articles: values.articles,
       accountable_person: values.accountablePerson,
       description: values.description,
-      date_of_assumption: values.dateOfAssumption,
+      date_of_assumption: formattedAssumptionDate,
       quantity_per_property: values.quantityPerProperty,
       quantity_per_physical: values.quantityPerPhysical,
       shortage_overage_quantity: values.shortageOverageQuantity,
@@ -37,7 +51,7 @@ const Form = () => {
       status:
         localStorage.getItem("status") === "Admin" ? "Accepted" : "Pending",
     });
-    // console.log(res);
+    console.log(res);
     if (res.status === 201) {
       setNotification("New property added successfully");
       resetForm();
@@ -119,19 +133,46 @@ const Form = () => {
                 }
                 sx={{ gridColumn: "span 2" }}
               />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="text"
-                label="Date of Assumption"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.dateOfAssumption}
-                name="dateOfAssumption"
-                error={!!touched.dateOfAssumption && !!errors.dateOfAssumption}
-                helperText={touched.dateOfAssumption && errors.dateOfAssumption}
-                sx={{ gridColumn: "span 2" }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Date of Assumption"
+                  // value={assumptionDate}
+                  // onChange={(date) => setAssumptionDate(date)}
+                  value={values.dateOfAssumption}
+                  onChange={(date) =>{
+                    console.log(date);
+                    setAssumptionDate(date);
+                    handleChange({
+                      target: {
+                        name: "dateOfAssumption",
+                        value: date, // Update to return the Date object directly
+                      },
+                    })}
+                  }
+
+                  slotProps={{
+                    textField: {
+                      helperText: touched.dateOfAssumption && errors.dateOfAssumption,
+                      sx: {
+                        color: touched.dateOfAssumption && errors.dateOfAssumption ? "red" : undefined,
+                      },
+                    },
+                  }}
+                  
+                  renderInput={(startProps) => (
+                    <TextField
+                      fullWidth
+                      variant="filled"
+                      type="text"
+                      label="Date of Assumption"
+                      error={!!touched.dateOfAssumption && !!errors.dateOfAssumption}
+                      helperText={touched.dateOfAssumption && errors.dateOfAssumption}
+                      {...startProps}
+                    />
+                  )}
+                  sx={{ gridColumn: "span 2" }}
+                />
+              </LocalizationProvider>
               <TextField
                 fullWidth
                 variant="filled"
@@ -290,6 +331,7 @@ const Form = () => {
                 type="submit"
                 style={{ backgroundColor: "green", color: "white" }}
                 variant="contained"
+                // onClick={()=>handleFormSubmit(values, {resetForm})}
               >
                 Submit
               </Button>
@@ -304,41 +346,35 @@ const Form = () => {
 const phoneRegExp =
   /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
 
-const checkoutSchema = yup.object().shape({
-  articles: yup.string().required("Articles is required"),
-  description: yup.string().required("Description is required"),
-  accountablePerson: yup.string().required("Accountable Person is required"),
-  dateOfAssumption: yup.string().required("Date of Assumption is required"),
-  quantityPerProperty: yup
-    .number()
-    .required("Quantity per Property is required"),
-  quantityPerPhysical: yup
-    .number()
-    .required("Quantity per Physical is required"),
-  shortageOverageQuantity: yup
-    .string()
-    .required("Shortage/Overage is required"),
-  shortageOverageValue: yup.string().required("Shortage/Overage is required"),
-  unitOfMeasure: yup.string().required("Unit of Measure is required"),
-  unitValue: yup.number().required("Unit Value is required"),
-  physicalValue: yup.number().required("Physical Value is required"),
-  propertyNumber: yup.string().required("Property Value is required"),
-  remarks: yup.string().required("Remarks is required"),
-});
-const initialValues = {
-  articles: "",
-  description: "",
-  accountablePerson: "",
-  dateOfAssumption: "",
-  quantityPerProperty: "",
-  quantityPerPhysical: "",
-  shortageOverageQuantity: "",
-  shortageOverageValue: "",
-  unitOfMeasure: "",
-  unitValue: "",
-  physicalValue: "",
-  propertyNumber: "",
-  remarks: "",
-};
-
+  const checkoutSchema = yup.object().shape({
+    articles: yup.string().required("Articles is required"),
+    description: yup.string().required("Description is required"),
+    accountablePerson: yup.string().required("Accountable Person is required"),
+    dateOfAssumption: yup.date().required("Date of Assumption is required"),
+    quantityPerProperty: yup.number().required("Quantity per Property is required"),
+    quantityPerPhysical: yup.number().required("Quantity per Physical is required"),
+    shortageOverageQuantity: yup.string().required("Shortage/Overage is required"),
+    shortageOverageValue: yup.string().required("Shortage/Overage is required"),
+    unitOfMeasure: yup.string().required("Unit of Measure is required"),
+    unitValue: yup.number().required("Unit Value is required"),
+    physicalValue: yup.number().required("Physical Value is required"),
+    propertyNumber: yup.string().required("Property Value is required"),
+    remarks: yup.string().required("Remarks is required"),
+  });
+  
+  const initialValues = {
+    articles: "",
+    description: "",
+    accountablePerson: "",
+    dateOfAssumption: "",
+    quantityPerProperty: "",
+    quantityPerPhysical: "",
+    shortageOverageQuantity: "",
+    shortageOverageValue: "",
+    unitOfMeasure: "",
+    unitValue: "",
+    physicalValue: "",
+    propertyNumber: "",
+    remarks: "",
+  };
 export default Form;
